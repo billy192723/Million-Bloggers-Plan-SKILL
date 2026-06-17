@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Test artifacts
+.coverage
+htmlcov/
+*.log
+
+# User-specific (don't commit personal config)
+push-config.local.md
+*.local.json
+.env
+.env.local
+
+# OS
+Thumbs.db
+desktop.ini
