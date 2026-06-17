@@ -1,10 +1,10 @@
 ---
 type: template
 template_for: rewrite-brief
-output_path: appends to: 博主计划/{region}/{platform}/04-内容卡/{card_id}-rewrite.md
+output_path: "appends to: 博主计划/{region}/{platform}/04-内容卡/{card_id}-rewrite.md"
 used_by: /rewrite (R3)
+notes: When /daily generates one idea with multi-platform package, the skill creates ONE card per platform (not one card with all platforms). Cross-reference via `related_cards` frontmatter. This keeps each platform's data dashboard clean.
 ---
-
 # R3 脚本改写器
 
 > **零外部 API**(用 SKILL 自身 LLM,即 Hermes 当前对话模型)
