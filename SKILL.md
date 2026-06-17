@@ -185,7 +185,7 @@ Full setup tutorial: `references/push-channels.md`.
 
 1. Read `_全局/04-推送配置.md` → parse channel config
 2. Read the target content card (frontmatter only) → render summary
-3. For each enabled channel, call the corresponding sender in `scripts/push-dispatcher.py`
+3. For each enabled channel, call the corresponding sender in `scripts/push_dispatcher.py`
 4. Return per-channel success/fail summary
 
 ### Message format (per choice 3A: summary + link)
@@ -247,11 +247,11 @@ Each push is a **summary card** with a link back to the Obsidian card. The link 
 - Writes N A/B cards under `{region}/{platform}/04-内容卡/ab/`, all with same `ab_group` ID
 - User publishes each variant
 - After 24h-7d, user fills `actual_views` + `actual_engagement_rate`
-- Run `python scripts/ab-test-tracker.py --platform=小红书` → auto-evaluates winner/loser, writes `ab_result` back
+- Run `python scripts/ab_test_tracker.py --platform=小红书` → auto-evaluates winner/loser, writes `ab_result` back
 
 **Output**: Winner declared, A/B cards tagged with result.
 
-**Scripts**: `scripts/ab-test-tracker.py` (read A/B cards, compute lift, write back).
+**Scripts**: `scripts/ab_test_tracker.py` (read A/B cards, compute lift, write back).
 **Template**: `templates/ab-test-card.md`.
 
 **Zero API**: ✅ Pure logic + user-provided actuals.

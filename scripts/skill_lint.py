@@ -159,7 +159,9 @@ def check_file_references(skill_path: Path) -> list:
 
 
 def check_secrets(skill_path: Path) -> list:
-    """Check for accidentally committed secrets."""
+    """Check for accidentally committed secrets.
+    Excludes tests/ directory (test fixtures legitimately use fake key patterns).
+    """
     issues = []
     secret_patterns = [
         (r"ghp_[a-zA-Z0-9]{30,}", "GitHub personal token"),
@@ -171,6 +173,9 @@ def check_secrets(skill_path: Path) -> list:
     ]
     for f in skill_path.rglob("*"):
         if f.is_dir() or ".git" in f.parts or "__pycache__" in f.parts:
+            continue
+        # Skip tests/ — fixtures legitimately use fake key patterns
+        if "tests" in f.parts:
             continue
         if not f.is_file():
             continue
