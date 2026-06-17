@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate SKILL
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pyyaml
+        run: pip install pyyaml
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          python -c "
+          import yaml, re, pathlib, sys
+          p = pathlib.Path('SKILL.md')
+          c = p.read_text(encoding='utf-8')
+          assert c.startswith('---'), 'must start with ---'
+          m = re.search(r'\n---\s*\n', c[3:])
+          assert m, 'no closing ---'
+          fm = yaml.safe_load(c[3:m.start()+3])
+          assert 'name' in fm, 'missing name field'
+          assert 'description' in fm, 'missing description field'
+          assert re.match(r'^[a-z0-9-]+$', fm['name']), f'invalid name: {fm[\"name\"]}'
+          assert len(fm['name']) <= 64, f'name too long: {len(fm[\"name\"])}'
+          assert len(fm['description']) <= 1024, f'desc too long: {len(fm[\"description\"])}'
+          assert len(c) <= 100000, f'file too big: {len(c)}'
+          print(f'✓ SKILL.md valid (name={fm[\"name\"]}, desc={len(fm[\"description\"])} chars, size={len(c):,} chars)')
+          "
+
+      - name: Validate all markdown frontmatter
+        run: |
+          python -c "
+          import yaml, re, pathlib, sys
+          files = list(pathlib.Path('templates').rglob('*.md')) + \
+                  list(pathlib.Path('references').rglob('*.md')) + \
+                  [pathlib.Path('README.md'), pathlib.Path('INSTALLATION.md'),
+                   pathlib.Path('CHANGELOG.md'), pathlib.Path('CONTRIBUTING.md')]
+          errors = 0
+          for f in files:
+              c = f.read_text(encoding='utf-8')
+              if not c.startswith('---'):
+                  print(f'⚠ {f}: no frontmatter (skipping)')
+                  continue
+              m = re.search(r'\n---\s*\n', c[3:])
+              if not m:
+                  print(f'✗ {f}: malformed frontmatter (no closing ---)')
+                  errors += 1
+                  continue
+              try:
+                  fm = yaml.safe_load(c[3:m.start()+3])
+                  if not isinstance(fm, dict):
+                      print(f'✗ {f}: frontmatter is not a mapping')
+                      errors += 1
+                      continue
+              except yaml.YAMLError as e:
+                  print(f'✗ {f}: YAML parse error: {e}')
+                  errors += 1
+                  continue
+              print(f'✓ {f}')
+          sys.exit(1 if errors else 0)
+          "
+
+      - name: Validate Python scripts
+        run: |
+          for f in scripts/*.py; do
+            python -m py_compile "$f" && echo "✓ $f"
+          done
+
+      - name: Check Python scripts are runnable (--help)
+        run: |
+          for f in scripts/*.py; do
+            python "$f" --help > /dev/null 2>&1 && echo "✓ $f --help" || echo "✗ $f --help failed"
+          done
+
+      - name: Validate file sizes
+        run: |
+          python -c "
+          import pathlib
+          for f in pathlib.Path('.').rglob('*.md'):
+              if '.git' in f.parts:
+                  continue
+              size = f.stat().st_size
+              if size > 100_000:
+                  print(f'⚠ {f}: {size:,} bytes (over 100k limit)')
+              else:
+                  print(f'  {f}: {size:,} bytes')
+          "
+
+      - name: Check for accidental secrets
+        run: |
+          # Look for patterns that look like leaked credentials
+          if grep -rE 'ghp_[a-zA-Z0-9]{36,}|sk-[a-zA-Z0-9]{20,}|AKIA[0-9A-Z]{16}' . 2>/dev/null; then
+            echo "✗ Found potential secret in repository!"
+            exit 1
+          else
+            echo "✓ No obvious secrets found"
+          fi
