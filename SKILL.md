@@ -647,45 +647,62 @@ Skill: [next /daily will include YouTube packages automatically]
 
 | Script | Command | What it does |
 |---|---|---|
-| `daily-content.py` | `/daily` | Generate today's content cards for active platforms, drawing from inspiration pool + failure warnings + holiday calendar |
-| `weekly-review.py` | `/review` | Compute hit rate, platform breakdown, top/bottom 3, and 3-5 next-week recommendations |
-| `xplatform-roi.py` | `/xplatform` | Rank platforms by ROI from `cross_platform_group`-tagged cards, output migration recommendations |
-| `monthly-report.py` | `/monthly` | (alias for `skill-report.py`) Generate monthly self-check report |
-| `inspiration-manager.py` | `/inspire` | Add/list/link/archive inspirations with auto-scoring |
-| `failure-manager.py` | `/failure` | Add/list/patterns/archive failures with auto-categorization |
-| `ab-test-tracker.py` | `/ab-test` | Evaluate A/B test groups, declare winner/loser |
-| `push-dispatcher.py` | `/push` | Push content card summary to IM (DingTalk/Feishu/WeCom/WeChat) |
-| `skill-lint.py` | (CI + dev) | Validate SKILL.md frontmatter, scripts, file references, secrets |
+| `daily_content.py` | `/daily` | Generate today's content cards for active platforms, drawing from inspiration pool + failure warnings + holiday calendar |
+| `weekly_review.py` | `/review` | Compute hit rate, platform breakdown, top/bottom 3, and 3-5 next-week recommendations |
+| `xplatform_roi.py` | `/xplatform` | Rank platforms by ROI from `cross_platform_group`-tagged cards, output migration recommendations |
+| `monthly_report.py` | `/monthly` | (alias for `skill_report.py`) Generate monthly self-check report |
+| `inspiration_manager.py` | `/inspire` | Add/list/link/archive inspirations with auto-scoring |
+| `failure_manager.py` | `/failure` | Add/list/patterns/archive failures with auto-categorization |
+| `ab_test_tracker.py` | `/ab-test` | Evaluate A/B test groups, declare winner/loser |
+| `push_dispatcher.py` | `/push` | Push content card summary to IM (DingTalk/Feishu/WeCom/WeChat) |
+| `skill_lint.py` | (CI + dev) | Validate SKILL.md frontmatter, scripts, file references, secrets |
+| `_common.py` | (shared) | Logger, error handler, VaultPath, config loader (used by all above) |
 
 ### Common CLI patterns
 
 ```bash
 # Generate today's cards
-python scripts/daily-content.py --vault ~/Documents/Million-Bloggers-Plan
+python scripts/daily_content.py --vault ~/Documents/Million-Bloggers-Plan
 
 # Generate for one platform
-python scripts/daily-content.py --platform=小红书 --count=3 --idea "AI 工具横评"
+python scripts/daily_content.py --platform=小红书 --count=3 --idea "AI 工具横评"
 
 # Run weekly review (writes to 05-周复盘/{ISO-week}.md)
-python scripts/weekly-review.py
+python scripts/weekly_review.py
 
 # Compare platforms
-python scripts/xplatform-roi.py --since 2026-06-01
+python scripts/xplatform_roi.py --since 2026-06-01
 
 # Inspiration pool
-python scripts/inspiration-manager.py add "对比 5 个 AI 写作工具" --tags=AI,对比
-python scripts/inspiration-manager.py list --status=unused --priority=4
-python scripts/inspiration-manager.py link INS-20260617-001 --card=2026-06-20-001
+python scripts/inspiration_manager.py add "对比 5 个 AI 写作工具" --tags=AI,对比
+python scripts/inspiration_manager.py list --status=unused --priority=4
+python scripts/inspiration_manager.py link INS-20260617-001 --card=2026-06-20-001
 
 # Failure log
-python scripts/failure-manager.py add 2026-06-15-002 --reason="标题党被限流"
-python scripts/failure-manager.py patterns
+python scripts/failure_manager.py add 2026-06-15-002 --reason="标题党被限流"
+python scripts/failure_manager.py patterns
 
 # Push to IM
-python scripts/push-dispatcher.py --config 04-push-config.md --test
+python scripts/push_dispatcher.py --config 04-push-config.md --test
 
 # Lint the skill
-python scripts/skill-lint.py --strict
+python scripts/skill_lint.py --strict
 ```
 
 All scripts support `--help` for full options.
+
+### Shared utilities
+
+`_common.py` provides reusable building blocks:
+
+| Function | What |
+|---|---|
+| `setup_logging(verbose)` | Consistent logger with `--verbose` flag |
+| `handle_errors` (decorator) | Catches exceptions, prints user-friendly hints, logs full traceback |
+| `load_config(path)` | Safe YAML loader (handles multi-doc) |
+| `VaultPath(root)` | Typed path helper for vault structure |
+| `format_table(headers, rows)` | Pretty Markdown table with column truncation |
+| `parse_frontmatter(path)` | YAML frontmatter from .md file |
+| `safe_write(path, content, overwrite)` | Create parent dirs, optionally skip existing |
+
+All scripts use these. 50 unit tests cover the shared utilities.

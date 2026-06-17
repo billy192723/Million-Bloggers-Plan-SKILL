@@ -132,18 +132,24 @@ Million-Bloggers-Plan-SKILL/
 │   ├── traffic-prediction-model.md
 │   ├── push-channels.md         ← 4 IM channels setup
 │   └── holiday-calendar.md      ← 100+ events
-├── scripts/                     ← pure Python, no API key needed (9 scripts)
-│   ├── daily-content.py         ← /daily: generate today's cards
-│   ├── weekly-review.py         ← /review: hit rate + platform breakdown + recs
-│   ├── xplatform-roi.py         ← /xplatform: ROI ranking + migration recs
-│   ├── skill-report.py          ← /monthly: monthly self-check
-│   ├── inspiration-manager.py   ← /inspire: pool management
-│   ├── failure-manager.py       ← /failure: log + pattern analysis
-│   ├── ab-test-tracker.py       ← /ab-test: winner/loser declaration
-│   ├── push-dispatcher.py       ← /push: IM push (DingTalk/Feishu/WeCom/WeChat)
-│   └── skill-lint.py            ← CI + dev: validate frontmatter, scripts, secrets
-└── templates/                   ← markdown templates
-    ├── user-profile.md
+├── scripts/                     ← pure Python, no API key needed (10 files)
+│   ├── _common.py              ← shared: logger, error handler, VaultPath
+│   ├── daily_content.py        ← /daily: generate today's cards
+│   ├── weekly_review.py        ← /review: hit rate + platform breakdown + recs
+│   ├── xplatform_roi.py        ← /xplatform: ROI ranking + migration recs
+│   ├── skill_report.py         ← /monthly: monthly self-check
+│   ├── inspiration_manager.py  ← /inspire: pool management
+│   ├── failure_manager.py      ← /failure: log + pattern analysis
+│   ├── ab_test_tracker.py      ← /ab-test: winner/loser declaration
+│   ├── push_dispatcher.py      ← /push: IM push (DingTalk/Feishu/WeCom/WeChat)
+│   └── skill_lint.py           ← CI + dev: validate frontmatter, scripts, secrets
+├── tests/                      ← 50 unit tests for the shared utilities
+│   ├── test_common.py          ← VaultPath, load_config, parse_frontmatter, etc.
+│   ├── test_daily_content.py   ← /daily helpers
+│   ├── test_skill_lint.py      ← frontmatter + secret detection
+│   └── README.md
+└── templates/                  ← markdown templates
+    ├── platform-profile.md
     ├── incubation-plan.md
     ├── daily-content-card.md
     ├── content-calendar.md

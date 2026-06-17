@@ -84,7 +84,18 @@ def find_active_platforms(vault: Path) -> list:
                     if f"- [x] {p}" in text or f"- [X] {p}" in text:
                         target_platforms.append((region, p))
 
-    return target_platforms if target_platforms else [("CN", "抖音")]
+    # Normalize: convert lists to tuples (in case YAML stored as list-of-list)
+    normalized = []
+    for item in target_platforms:
+        if isinstance(item, (list, tuple)) and len(item) == 2:
+            normalized.append((str(item[0]), str(item[1])))
+        elif isinstance(item, str):
+            # "region:platform" format
+            if ":" in item:
+                r, p = item.split(":", 1)
+                normalized.append((r.strip(), p.strip()))
+
+    return normalized if normalized else [("CN", "抖音")]
 
 
 def find_unused_inspirations(vault: Path) -> list:

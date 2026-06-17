@@ -165,19 +165,22 @@ Tell the agent where to put the files when you first run `/onboard` (or let it d
 
 ## Optional: Python scripts
 
-**9 standalone scripts** live in `scripts/`. All are zero-API, pure-stdlib (only `pyyaml` is optional). They can be called manually, by an LLM agent, or wired into cronjobs.
+**10 standalone scripts** live in `scripts/` (9 runnable + `_common.py` shared lib). All are zero-API, pure-stdlib (only `pyyaml` is optional). They can be called manually, by an LLM agent, or wired into cronjobs.
 
 | Script | What | Example |
 |---|---|---|
-| `daily-content.py` | Generate today's cards | `python daily-content.py --platform=抖音` |
-| `weekly-review.py` | Compute hit rate + recs | `python weekly-review.py --week=2026-W25` |
-| `xplatform-roi.py` | Cross-platform ROI ranking | `python xplatform-roi.py --since 2026-06-01` |
-| `inspiration-manager.py` | Inspiration pool | `python inspiration-manager.py add "AI 副业" --tags=AI,副业` |
-| `failure-manager.py` | Failure log | `python failure-manager.py add 2026-06-15-002 --reason="标题党"` |
-| `ab-test-tracker.py` | A/B winner eval | `python ab-test-tracker.py --platform=小红书` |
-| `push-dispatcher.py` | IM push | `python push-dispatcher.py --config 04-push-config.md --test` |
-| `skill-report.py` | Monthly self-check | `python skill-report.py --month=2026-06` |
-| `skill-lint.py` | Validate SKILL structure | `python skill-lint.py --strict` |
+| `daily_content.py` | Generate today's cards | `python daily_content.py --platform=抖音` |
+| `weekly_review.py` | Compute hit rate + recs | `python weekly_review.py --week=2026-W25` |
+| `xplatform_roi.py` | Cross-platform ROI ranking | `python xplatform_roi.py --since 2026-06-01` |
+| `inspiration_manager.py` | Inspiration pool | `python inspiration_manager.py add "AI 副业" --tags=AI,副业` |
+| `failure_manager.py` | Failure log | `python failure_manager.py add 2026-06-15-002 --reason="标题党"` |
+| `ab_test_tracker.py` | A/B winner eval | `python ab_test_tracker.py --platform=小红书` |
+| `push_dispatcher.py` | IM push | `python push_dispatcher.py --config 04-push-config.md --test` |
+| `skill_report.py` | Monthly self-check | `python skill_report.py --month=2026-06` |
+| `skill_lint.py` | Validate SKILL structure | `python skill_lint.py --strict` |
+| `_common.py` | Shared utilities (logger, error handler, VaultPath) | (imported by all above) |
+
+**File naming**: All Python files use underscores (not dashes) so they can be `import`ed by other tools. File names like `daily_content.py` are importable as `import daily_content`.
 
 Dependencies: `pyyaml` (most agents have it). Install with:
 
@@ -186,6 +189,16 @@ pip install pyyaml
 ```
 
 All scripts support `--help` for full options and `--vault <path>` (where applicable) to override the default vault location.
+
+## Optional: Unit tests
+
+50 unit tests in `tests/` cover the shared utilities, daily content generation, and skill linting. Run locally:
+
+```bash
+python -m unittest discover tests
+```
+
+Tests run automatically in CI on every push.
 
 ---
 

@@ -164,7 +164,8 @@ def check_secrets(skill_path: Path) -> list:
     secret_patterns = [
         (r"ghp_[a-zA-Z0-9]{30,}", "GitHub personal token"),
         (r"gho_[a-zA-Z0-9]{30,}", "GitHub OAuth token"),
-        (r"sk-[a-zA-Z0-9]{20,}", "OpenAI/Stripe API key"),
+        (r"sk-[a-zA-Z0-9-]{20,}", "OpenAI/Stripe API key"),
+        (r"sk-proj-[a-zA-Z0-9-]{20,}", "OpenAI project key"),
         (r"AKIA[0-9A-Z]{16}", "AWS access key"),
         (r"xox[baprs]-[a-zA-Z0-9-]+", "Slack token"),
     ]
