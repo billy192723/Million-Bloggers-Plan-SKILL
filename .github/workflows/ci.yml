@@ -88,6 +88,10 @@ jobs:
             python "$f" --help > /dev/null 2>&1 && echo "✓ $f --help" || echo "✗ $f --help failed"
           done
 
+      - name: Run skill-lint
+        run: |
+          python scripts/skill-lint.py --path . --strict
+
       - name: Validate file sizes
         run: |
           python -c "

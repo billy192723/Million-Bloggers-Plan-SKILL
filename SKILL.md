@@ -640,3 +640,52 @@ Skill: [next /daily will include YouTube packages automatically]
 - All "predictions" must show assumptions. Never present a number as fact.
 - The model is calibrated by `/review`. First 4 weeks: wide ranges, lots of caveats. After W4: tighter.
 - If the user has no notes tool, ask before defaulting to a plain folder.
+
+## Scripts Reference
+
+9 standalone Python scripts live in `scripts/`. All are pure-stdlib (only `pyyaml` is optional) and zero-API. They are designed to be called manually, by an LLM agent, or wired into cronjobs.
+
+| Script | Command | What it does |
+|---|---|---|
+| `daily-content.py` | `/daily` | Generate today's content cards for active platforms, drawing from inspiration pool + failure warnings + holiday calendar |
+| `weekly-review.py` | `/review` | Compute hit rate, platform breakdown, top/bottom 3, and 3-5 next-week recommendations |
+| `xplatform-roi.py` | `/xplatform` | Rank platforms by ROI from `cross_platform_group`-tagged cards, output migration recommendations |
+| `monthly-report.py` | `/monthly` | (alias for `skill-report.py`) Generate monthly self-check report |
+| `inspiration-manager.py` | `/inspire` | Add/list/link/archive inspirations with auto-scoring |
+| `failure-manager.py` | `/failure` | Add/list/patterns/archive failures with auto-categorization |
+| `ab-test-tracker.py` | `/ab-test` | Evaluate A/B test groups, declare winner/loser |
+| `push-dispatcher.py` | `/push` | Push content card summary to IM (DingTalk/Feishu/WeCom/WeChat) |
+| `skill-lint.py` | (CI + dev) | Validate SKILL.md frontmatter, scripts, file references, secrets |
+
+### Common CLI patterns
+
+```bash
+# Generate today's cards
+python scripts/daily-content.py --vault ~/Documents/Million-Bloggers-Plan
+
+# Generate for one platform
+python scripts/daily-content.py --platform=小红书 --count=3 --idea "AI 工具横评"
+
+# Run weekly review (writes to 05-周复盘/{ISO-week}.md)
+python scripts/weekly-review.py
+
+# Compare platforms
+python scripts/xplatform-roi.py --since 2026-06-01
+
+# Inspiration pool
+python scripts/inspiration-manager.py add "对比 5 个 AI 写作工具" --tags=AI,对比
+python scripts/inspiration-manager.py list --status=unused --priority=4
+python scripts/inspiration-manager.py link INS-20260617-001 --card=2026-06-20-001
+
+# Failure log
+python scripts/failure-manager.py add 2026-06-15-002 --reason="标题党被限流"
+python scripts/failure-manager.py patterns
+
+# Push to IM
+python scripts/push-dispatcher.py --config 04-push-config.md --test
+
+# Lint the skill
+python scripts/skill-lint.py --strict
+```
+
+All scripts support `--help` for full options.

@@ -165,19 +165,27 @@ Tell the agent where to put the files when you first run `/onboard` (or let it d
 
 ## Optional: Python scripts
 
-Three scripts work standalone (no agent needed):
+**9 standalone scripts** live in `scripts/`. All are zero-API, pure-stdlib (only `pyyaml` is optional). They can be called manually, by an LLM agent, or wired into cronjobs.
 
-| Script | What | Use |
+| Script | What | Example |
 |---|---|---|
-| `scripts/push-dispatcher.py` | Push content card to IM | `python push-dispatcher.py --config <path> --test` |
-| `scripts/ab-test-tracker.py` | A/B winner evaluation | `python ab-test-tracker.py --platform=xiaohongshu` |
-| `scripts/skill-report.py` | Monthly self-check | `python skill-report.py --month=2026-06` |
+| `daily-content.py` | Generate today's cards | `python daily-content.py --platform=抖音` |
+| `weekly-review.py` | Compute hit rate + recs | `python weekly-review.py --week=2026-W25` |
+| `xplatform-roi.py` | Cross-platform ROI ranking | `python xplatform-roi.py --since 2026-06-01` |
+| `inspiration-manager.py` | Inspiration pool | `python inspiration-manager.py add "AI 副业" --tags=AI,副业` |
+| `failure-manager.py` | Failure log | `python failure-manager.py add 2026-06-15-002 --reason="标题党"` |
+| `ab-test-tracker.py` | A/B winner eval | `python ab-test-tracker.py --platform=小红书` |
+| `push-dispatcher.py` | IM push | `python push-dispatcher.py --config 04-push-config.md --test` |
+| `skill-report.py` | Monthly self-check | `python skill-report.py --month=2026-06` |
+| `skill-lint.py` | Validate SKILL structure | `python skill-lint.py --strict` |
 
 Dependencies: `pyyaml` (most agents have it). Install with:
 
 ```bash
 pip install pyyaml
 ```
+
+All scripts support `--help` for full options and `--vault <path>` (where applicable) to override the default vault location.
 
 ---
 

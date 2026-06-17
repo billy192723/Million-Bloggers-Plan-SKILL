@@ -132,10 +132,16 @@ Million-Bloggers-Plan-SKILL/
 │   ├── traffic-prediction-model.md
 │   ├── push-channels.md         ← 4 IM channels setup
 │   └── holiday-calendar.md      ← 100+ events
-├── scripts/                     ← pure Python, no API key needed
-│   ├── push-dispatcher.py       ← IM push
-│   ├── ab-test-tracker.py       ← A/B winner declaration
-│   └── skill-report.py          ← monthly self-check
+├── scripts/                     ← pure Python, no API key needed (9 scripts)
+│   ├── daily-content.py         ← /daily: generate today's cards
+│   ├── weekly-review.py         ← /review: hit rate + platform breakdown + recs
+│   ├── xplatform-roi.py         ← /xplatform: ROI ranking + migration recs
+│   ├── skill-report.py          ← /monthly: monthly self-check
+│   ├── inspiration-manager.py   ← /inspire: pool management
+│   ├── failure-manager.py       ← /failure: log + pattern analysis
+│   ├── ab-test-tracker.py       ← /ab-test: winner/loser declaration
+│   ├── push-dispatcher.py       ← /push: IM push (DingTalk/Feishu/WeCom/WeChat)
+│   └── skill-lint.py            ← CI + dev: validate frontmatter, scripts, secrets
 └── templates/                   ← markdown templates
     ├── user-profile.md
     ├── incubation-plan.md
