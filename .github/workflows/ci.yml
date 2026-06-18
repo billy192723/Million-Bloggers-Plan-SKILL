@@ -26,37 +26,31 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pyyaml
 
-      - name: Run skill-lint (catch all errors)
+      - name: Run skill-lint (with full output, no fail on warnings)
         run: |
           set +e
-          echo "### skill-lint output ###"
-          python scripts/skill_lint.py --path . --strict 2>&1
+          echo "### skill-lint output (no --strict) ###"
+          python scripts/skill_lint.py --path . 2>&1
           SL_EXIT=$?
           echo "### skill-lint exit: $SL_EXIT ###"
           echo ""
-          echo "### direct yaml test ###"
-          python -c "
-          import yaml, sys
-          print('yaml version:', yaml.__version__)
-          print('python:', sys.version)
-          with open('SKILL.md', encoding='utf-8') as f:
-              content = f.read()
-          print('size:', len(content))
-          print('first 80 chars:', repr(content[:80]))
-          parts = content.split('---')
-          print('--- count:', len(parts) - 1)
-          if len(parts) >= 3:
-              fm_text = parts[1]
-              print('frontmatter text len:', len(fm_text))
-              print('frontmatter first 100:', repr(fm_text[:100]))
-              try:
-                  fm = yaml.safe_load(fm_text)
-                  print('parsed OK, type:', type(fm).__name__)
-                  if isinstance(fm, dict):
-                      print('  keys:', list(fm.keys()))
-              except Exception as e:
-                  print('YAML error:', e)
-          " 2>&1
-          PY_EXIT=$?
-          echo "### yaml test exit: $PY_EXIT ###"
+          echo "### with --strict ###"
+          python scripts/skill_lint.py --path . --strict 2>&1
+          STRICT_EXIT=$?
+          echo "### strict exit: $STRICT_EXIT ###"
+          true
+
+      - name: Run unit tests
+        run: |
+          set +e
+          python -m unittest discover tests 2>&1 | tail -20
+          echo "### tests exit: ${PIPESTATUS[0]} ###"
+          true
+
+      - name: Verify all scripts --help
+        run: |
+          set +e
+          for f in scripts/*.py; do
+            python "$f" --help > /dev/null 2>&1 && echo "✓ $f" || echo "✗ $f"
+          done
           true
