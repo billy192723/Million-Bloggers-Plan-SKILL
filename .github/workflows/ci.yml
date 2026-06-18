@@ -26,31 +26,14 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pyyaml
 
-      - name: Run skill-lint (with full output, no fail on warnings)
-        run: |
-          set +e
-          echo "### skill-lint output (no --strict) ###"
-          python scripts/skill_lint.py --path . 2>&1
-          SL_EXIT=$?
-          echo "### skill-lint exit: $SL_EXIT ###"
-          echo ""
-          echo "### with --strict ###"
-          python scripts/skill_lint.py --path . --strict 2>&1
-          STRICT_EXIT=$?
-          echo "### strict exit: $STRICT_EXIT ###"
-          true
+      - name: Run skill-lint (strict)
+        run: python scripts/skill_lint.py --path . --strict
 
       - name: Run unit tests
-        run: |
-          set +e
-          python -m unittest discover tests 2>&1 | tail -20
-          echo "### tests exit: ${PIPESTATUS[0]} ###"
-          true
+        run: python -m unittest discover tests
 
       - name: Verify all scripts --help
         run: |
-          set +e
           for f in scripts/*.py; do
-            python "$f" --help > /dev/null 2>&1 && echo "✓ $f" || echo "✗ $f"
+            python "$f" --help > /dev/null 2>&1 && echo "✓ $f" || (echo "✗ $f" && exit 1)
           done
-          true
