@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate SKILL
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install pyyaml
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pyyaml
+
+      - name: Run skill-lint (no strict, no fail on warn)
+        run: python3 scripts/skill_lint.py --path .
+
+      - name: Run unit tests
+        run: python3 -m unittest discover tests
+
+      - name: Verify all scripts --help
+        run: |
+          for f in scripts/*.py; do
+            python3 "$f" --help > /dev/null 2>&1 && echo "✓ $f" || (echo "✗ $f" && exit 1)
+          done
