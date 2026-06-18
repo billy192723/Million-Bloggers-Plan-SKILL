@@ -26,11 +26,24 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pyyaml
 
-      - name: Run skill-lint
-        run: python scripts/skill_lint.py --path . --strict
+      - name: Debug env
+        run: |
+          echo "Python: $(python --version)"
+          echo "yaml: $(python -c 'import yaml; print(yaml.__version__)')"
+          echo "ls SKILL.md:"
+          ls -la SKILL.md
+          echo "head of SKILL.md:"
+          head -2 SKILL.md
+
+      - name: Run skill-lint (verbose)
+        run: |
+          python scripts/skill_lint.py --path . --strict
+          echo "Exit: $?"
 
       - name: Run unit tests
-        run: python -m unittest discover tests
+        run: |
+          python -m unittest discover tests 2>&1 | tail -20
+          echo "Exit: ${PIPESTATUS[0]}"
 
       - name: Verify all scripts --help
         run: |
