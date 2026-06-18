@@ -31,8 +31,10 @@ jobs:
           python -c "
           import yaml, re, pathlib, sys
           p = pathlib.Path('SKILL.md')
+          print(f'DEBUG: SKILL.md size={p.stat().st_size}, exists={p.exists()}', file=sys.stderr)
           c = p.read_text(encoding='utf-8')
-          assert c.startswith('---'), 'must start with ---'
+          print(f'DEBUG: first 50 chars: {c[:50]!r}', file=sys.stderr)
+          assert c.startswith('---'), f'must start with ---, got: {c[:30]!r}'
           m = re.search(r'\n---\s*\n', c[3:])
           assert m, 'no closing ---'
           fm = yaml.safe_load(c[3:m.start()+3])
