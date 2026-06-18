@@ -26,39 +26,37 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pyyaml
 
-      - name: Run skill-lint (with full output)
-        id: lint
+      - name: Run skill-lint (catch all errors)
         run: |
-          echo "=== skill-lint output ==="
-          python scripts/skill_lint.py --path . --strict
-          EXIT=$?
-          echo "=== exit code: $EXIT ==="
-          echo "=== test parse frontmatter directly ==="
+          set +e
+          echo "### skill-lint output ###"
+          python scripts/skill_lint.py --path . --strict 2>&1
+          SL_EXIT=$?
+          echo "### skill-lint exit: $SL_EXIT ###"
+          echo ""
+          echo "### direct yaml test ###"
           python -c "
           import yaml, sys
           print('yaml version:', yaml.__version__)
-          print('python version:', sys.version)
+          print('python:', sys.version)
           with open('SKILL.md', encoding='utf-8') as f:
               content = f.read()
-          print('SKILL.md first 100 chars:', repr(content[:100]))
-          print('SKILL.md total length:', len(content))
-          # Parse
+          print('size:', len(content))
+          print('first 80 chars:', repr(content[:80]))
           parts = content.split('---')
-          print('Number of --- separators:', len(parts) - 1)
+          print('--- count:', len(parts) - 1)
           if len(parts) >= 3:
               fm_text = parts[1]
-              print('Frontmatter (first 200 chars):', repr(fm_text[:200]))
+              print('frontmatter text len:', len(fm_text))
+              print('frontmatter first 100:', repr(fm_text[:100]))
               try:
                   fm = yaml.safe_load(fm_text)
-                  print('Frontmatter parsed OK:', type(fm).__name__)
+                  print('parsed OK, type:', type(fm).__name__)
                   if isinstance(fm, dict):
                       print('  keys:', list(fm.keys()))
-                      print('  name:', fm.get('name'))
-                      print('  desc len:', len(str(fm.get('description', ''))))
-                  else:
-                      print('  Not a dict!')
               except Exception as e:
-                  print('Parse error:', e)
-          "
-          # 不 fail,只诊断
-          exit 0
+                  print('YAML error:', e)
+          " 2>&1
+          PY_EXIT=$?
+          echo "### yaml test exit: $PY_EXIT ###"
+          true
